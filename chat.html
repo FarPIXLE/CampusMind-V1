@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirecting…</title>
+
+  <!-- Immediate meta refresh fallback -->
+  <meta http-equiv="refresh" content="0;url=https://hack.chat/?72ktf9p5">
+  <style>
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    .center{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;text-align:center;padding:1rem}
+    .card{max-width:640px;padding:1.4rem;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    a{color:inherit;text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div class="card">
+      <h1>Redirecting now…</h1>
+      <p>If nothing happens, click the link below:</p>
+      <p><a id="targetLink" href="https://hack.chat/?72ktf9p5" target="_self" rel="noopener noreferrer">https://hack.chat/?72ktf9p5</a></p>
+      <p style="font-size:.85rem;color:#555;margin-top:.6rem;">(This will take you to the exact URL you provided.)</p>
+    </div>
+  </div>
+
+  <script>
+    // Exact target URL (as requested)
+    const target = "https://hack.chat/?72ktf9p5";
+
+    // attempt immediate redirect (replace so back button doesn't return here)
+    try {
+      window.location.replace(target);
+    } catch (e) {
+      // If replace is blocked, set window.location as fallback
+      window.location.href = target;
+    }
+  </script>
+</body>
+</html>

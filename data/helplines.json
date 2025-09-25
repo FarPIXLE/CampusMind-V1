@@ -1,0 +1,14 @@
+{
+  "india": {
+    "kiran": {
+      "name": "KIRAN Mental Health Helpline",
+      "number": "1800-599-0019",
+      "description": "National Mental Health Helpline"
+    },
+    "icall": {
+      "name": "iCall Psychosocial Helpline",
+      "number": "9152987821", 
+      "description": "Psychosocial Support"
+    }
+  }
+}
