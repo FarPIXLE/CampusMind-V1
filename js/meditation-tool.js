@@ -1,79 +1,81 @@
-const MeditationTool = (function() {
-  let interval;
-  let secondsLeft = 300; // default 5 minutes
-  let sessionsCount = 0;
-  let minutesCount = 0;
+// Simple meditation timer with locally saved completed-session totals.
+const MeditationTool = (() => {
+    let interval = null;
+    let secondsLeft = 300;
+    let sessionLength = 300;
+    let running = false;
+    let sessionsCount = 0;
+    let minutesCount = 0;
 
-  const timerDisplay = document.getElementById('meditation-timer');
-  const sessionsElem = document.getElementById('meditation-sessions');
-  const minutesElem = document.getElementById('meditation-minutes');
-
-  function updateDisplay() {
-    let minutes = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
-    let seconds = (secondsLeft % 60).toString().padStart(2, '0');
-    if (timerDisplay) {
-      timerDisplay.textContent = `${minutes}:${seconds}`;
+    function readStats() {
+        try {
+            const stats = JSON.parse(localStorage.getItem('meditationStats') || '{}');
+            sessionsCount = Number(stats.sessions) || 0;
+            minutesCount = Number(stats.minutes) || 0;
+        } catch (_) { sessionsCount = 0; minutesCount = 0; }
     }
-  }
-
-  function setTimer(seconds) {
-    clearInterval(interval);
-    secondsLeft = seconds;
-    updateDisplay();
-  }
+    function display() {
+        const timer = document.getElementById('meditation-timer');
+        if (timer) timer.textContent = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+        const progress = document.getElementById('meditation-progress');
+        if (progress) progress.style.width = `${Math.max(0, Math.min(100, 100 * (1 - secondsLeft / sessionLength)))}%`;
+        const sessions = document.getElementById('meditation-sessions');
+        const minutes = document.getElementById('meditation-minutes');
+        if (sessions) sessions.textContent = sessionsCount;
+        if (minutes) minutes.textContent = minutesCount;
+        const play = document.getElementById('meditation-play-btn');
+        const pause = document.getElementById('meditation-pause-btn');
+        if (play) play.style.display = running ? 'none' : 'inline-flex';
+        if (pause) { pause.style.display = running ? 'inline-flex' : 'none'; pause.textContent = 'Pause'; }
+        document.querySelectorAll('.meditation-controls .control-btn').forEach(button => {
+            button.classList.toggle('active', Number(button.dataset.time) === sessionLength);
+            button.disabled = running;
+        });
+    }
+    function setTimer(seconds) {
+        if (running || !Number.isFinite(seconds) || seconds <= 0) return;
+        clearInterval(interval);
+        sessionLength = seconds;
+        secondsLeft = seconds;
+        display();
+    }
     function startSession() {
-  clearInterval(interval);
-  
-  // Start meditation music
-  const music = document.getElementById('meditation-music');
-  if (music) {
-    music.loop = true;
-    music.play().catch(error => {
-      console.log('Music play failed:', error);
-    });
-  }
-  
-  interval = setInterval(() => {
-    if (secondsLeft > 0) {
-      secondsLeft--;
-      updateDisplay();
-    } else {
-      clearInterval(interval);
-      
-      // Stop meditation music
-      if (music) {
-        music.pause();
-        music.currentTime = 0;
-      }
-      
-      // Play bell sound
-      const bellSound = document.getElementById('end-sound');
-      if (bellSound) {
-        bellSound.play();
-      }
-      
-      sessionsCount++;
-      minutesCount += (parseInt(timerDisplay.textContent.split(':')[0], 10));
-      if (sessionsElem) sessionsElem.textContent = sessionsCount;
-      if (minutesElem) minutesElem.textContent = minutesCount;
-      alert('Meditation session completed!');
+        if (running) return;
+        if (secondsLeft <= 0) secondsLeft = sessionLength;
+        running = true;
+        const music = document.getElementById('meditation-music');
+        if (music) { music.loop = true; music.play().catch(() => {}); }
+        display();
+        interval = setInterval(() => {
+            if (secondsLeft > 0) { secondsLeft -= 1; display(); }
+            if (secondsLeft <= 0) completeSession();
+        }, 1000);
     }
-  }, 1000);
-}
-
-  function pauseSession() {
-    clearInterval(interval);
-    
-    // Pause meditation music when session is paused
-    const music = document.getElementById('meditation-music');
-    if (music) {
-      music.pause();
+    function pauseSession() {
+        if (!running) return;
+        running = false;
+        clearInterval(interval);
+        const music = document.getElementById('meditation-music');
+        if (music) music.pause();
+        display();
     }
-  }
-
-  return {
-    setTimer,
-    startSession,
-    pauseSession
-  };
+    function completeSession() {
+        clearInterval(interval);
+        running = false;
+        const music = document.getElementById('meditation-music');
+        if (music) { music.pause(); music.currentTime = 0; }
+        const bell = document.getElementById('end-sound');
+        if (bell) bell.play().catch(() => {});
+        sessionsCount += 1;
+        minutesCount += Math.round(sessionLength / 60);
+        try { localStorage.setItem('meditationStats', JSON.stringify({ sessions: sessionsCount, minutes: minutesCount })); } catch (_) { /* timer remains usable */ }
+        secondsLeft = sessionLength;
+        display();
+        const message = document.getElementById('meditation-status');
+        if (message) message.textContent = 'Session complete. Take a moment before returning to your day.';
+    }
+    function init() { readStats(); display(); }
+    init();
+    return { init, setTimer, startSession, pauseSession };
 })();
+window.MeditationTool = MeditationTool;

@@ -24,6 +24,7 @@ class CampusMindApp {
         try {
             this.setupGlobalEventListeners();
             this.initializeModules();
+            this.initializeCarePlan();
             this.handleUrlRouting();
             this.loadUserPreferences();
             this.setupAccessibilityFeatures();
@@ -270,9 +271,7 @@ class CampusMindApp {
             // Ctrl/Cmd + E = Emergency support
             if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
                 e.preventDefault();
-                if (window.CrisisSupport) {
-                    CrisisSupport.showEmergencyModal();
-                }
+                document.getElementById('crisis-contacts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
             // Escape = Close modals
@@ -302,68 +301,39 @@ class CampusMindApp {
             });
 
             window.addEventListener('offline', () => {
-                this.showNotification('You're offline. Some features may be limited.', 'warning', 10000);
+                this.showNotification("You're offline. Some features may be limited.", 'warning', 10000);
                 document.dispatchEvent(new CustomEvent('campusmind:networkOffline'));
             });
         }
     }
 
     initializeModules() {
-        // Initialize all feature modules
-        const modulePromises = [];
+        // The existing feature files expose initialized singleton tools, not classes.
+        this.modules.moodTracker = window.moodTrackerInstance || null;
+        this.modules.meditationTool = window.MeditationTool || null;
+        this.modules.breathingTool = window.BreathingTool || null;
+        this.modules.journalTool = window.JournalTool || null;
+    }
 
-        // Core modules
-        if (window.MoodTracker) {
-            this.modules.moodTracker = new MoodTracker();
-            modulePromises.push(this.modules.moodTracker.init());
-        }
-
-        if (window.MeditationTool) {
-            this.modules.meditationTool = new MeditationTool();
-            modulePromises.push(this.modules.meditationTool.init());
-        }
-
-        if (window.BreathingTool) {
-            this.modules.breathingTool = new BreathingTool();
-            modulePromises.push(this.modules.breathingTool.init());
-        }
-
-        if (window.JournalTool) {
-            this.modules.journalTool = new JournalTool();
-            modulePromises.push(this.modules.journalTool.init());
-        }
-
-        if (window.AssessmentTool) {
-            this.modules.assessmentTool = new AssessmentTool();
-            modulePromises.push(this.modules.assessmentTool.init());
-        }
-
-        if (window.ResourceLibrary) {
-            this.modules.resourceLibrary = new ResourceLibrary();
-            modulePromises.push(this.modules.resourceLibrary.init());
-        }
-
-        if (window.CrisisSupport) {
-            this.modules.crisisSupport = new CrisisSupport();
-            modulePromises.push(this.modules.crisisSupport.init());
-        }
-
-        if (window.PeerSupport) {
-            this.modules.peerSupport = new PeerSupport();
-            modulePromises.push(this.modules.peerSupport.init());
-        }
-
-        if (window.ProfessionalSupport) {
-            this.modules.professionalSupport = new ProfessionalSupport();
-            modulePromises.push(this.modules.professionalSupport.init());
-        }
-
-        // Wait for all modules to initialize
-        Promise.all(modulePromises).then(() => {
-            console.log('✅ All modules initialized successfully');
-        }).catch(error => {
-            console.error('❌ Module initialization error:', error);
+    initializeCarePlan() {
+        const container = document.getElementById('care-plan-options');
+        if (!container) return;
+        let saved = [];
+        try { saved = JSON.parse(localStorage.getItem('campusmind-care-plan') || '[]'); } catch (_) { saved = []; }
+        const status = document.getElementById('care-plan-status');
+        container.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            input.checked = saved.includes(input.value);
+            input.addEventListener('change', () => {
+                const selected = [...container.querySelectorAll('input:checked')].map(item => item.value);
+                try {
+                    localStorage.setItem('campusmind-care-plan', JSON.stringify(selected));
+                    if (status) status.textContent = selected.length ? `${selected.length} small step${selected.length === 1 ? '' : 's'} saved on this device.` : 'Your choices are saved on this device.';
+                } catch (_) {
+                    if (status) status.textContent = 'Browser storage is unavailable; your selections will last until you close this page.';
+                }
+            });
         });
+        if (status && saved.length) status.textContent = `${saved.length} small step${saved.length === 1 ? '' : 's'} saved on this device.`;
     }
 
     handleUrlRouting() {

@@ -37,13 +37,13 @@ class MoodTracker {
         });
 
         // Bind submit button
-        const submitBtn = document.getElementById('mood-submit');
+        const submitBtn = document.getElementById('mood-submit') || document.getElementById('save-mood-btn');
         if (submitBtn) {
             submitBtn.addEventListener('click', () => this.submitMood());
         }
 
         // Word count for notes
-        const moodNote = document.getElementById('mood-note');
+        const moodNote = document.getElementById('mood-note') || document.getElementById('mood-notes-textarea');
         if (moodNote) {
             moodNote.addEventListener('input', this.updateNoteStats.bind(this));
         }
@@ -72,7 +72,7 @@ class MoodTracker {
         this.currentMood = moodValue;
         
         // Enable submit button
-        const submitBtn = document.getElementById('mood-submit');
+        const submitBtn = document.getElementById('mood-submit') || document.getElementById('save-mood-btn');
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.classList.add('enabled');
@@ -104,7 +104,7 @@ class MoodTracker {
             return;
         }
         
-        const noteElement = document.getElementById('mood-note');
+        const noteElement = document.getElementById('mood-note') || document.getElementById('mood-notes-textarea');
         const note = noteElement ? noteElement.value.trim() : '';
         
         const moodEntry = {
@@ -120,13 +120,14 @@ class MoodTracker {
             })
         };
 
-        this.saveMoodEntry(moodEntry);
+        if (!this.saveMoodEntry(moodEntry)) return;
         this.showSuccess();
         this.updateStats();
         this.resetForm();
     }
 
     saveMoodEntry(entry) {
+        const previousEntries = this.entries.slice();
         // Remove any existing entry for today
         const today = entry.date;
         this.entries = this.entries.filter(e => e.date !== today);
@@ -141,9 +142,16 @@ class MoodTracker {
         this.entries = this.entries.slice(0, 90);
         
         // Save to localStorage
-        localStorage.setItem('moodEntries', JSON.stringify(this.entries));
+        try {
+            localStorage.setItem('moodEntries', JSON.stringify(this.entries));
+        } catch (error) {
+            this.entries = previousEntries;
+            this.showNotification('Could not save this check-in in browser storage. Your previous entries are still available.', 'error');
+            return false;
+        }
         
         console.log('Mood entry saved:', entry);
+        return true;
     }
 
     loadEntries() {
@@ -182,13 +190,13 @@ class MoodTracker {
         });
         
         // Reset note
-        const noteElement = document.getElementById('mood-note');
+        const noteElement = document.getElementById('mood-note') || document.getElementById('mood-notes-textarea');
         if (noteElement) {
             noteElement.value = '';
         }
         
         // Disable submit button
-        const submitBtn = document.getElementById('mood-submit');
+        const submitBtn = document.getElementById('mood-submit') || document.getElementById('save-mood-btn');
         if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.classList.remove('enabled');
@@ -231,6 +239,22 @@ class MoodTracker {
                 setTimeout(() => {
                     streakElement.style.animation = '';
                 }, 1000);
+            }
+        }
+
+        const calendar = document.getElementById('streak-calendar');
+        if (calendar) {
+            calendar.replaceChildren();
+            for (let offset = 27; offset >= 0; offset--) {
+                const date = new Date();
+                date.setDate(date.getDate() - offset);
+                const day = document.createElement('span');
+                day.className = 'calendar-day';
+                if (this.entries.some(entry => entry.date === date.toDateString())) day.classList.add('checked-in');
+                if (offset === 0) day.classList.add('today');
+                day.textContent = String(date.getDate());
+                day.title = `${date.toLocaleDateString()}${day.classList.contains('checked-in') ? ' · checked in' : ''}`;
+                calendar.appendChild(day);
             }
         }
     }
@@ -280,13 +304,13 @@ class MoodTracker {
 
     createMoodTrendHTML(days) {
         const moodEmojis = ['', '😢', '😔', '😐', '😊', '😄'];
-        const moodColors = ['', '#EF4444', '#F97316', '#6B7280', '#10B981', '#10B981'];
+        const moodColors = ['', '#C87870', '#C99A70', '#8A9690', '#709780', '#527A68'];
         
         let html = '<div class="mood-trend-chart">';
         
         days.forEach(day => {
             const emoji = day.mood ? moodEmojis[day.mood] : '⚪';
-            const color = day.mood ? moodColors[day.mood] : '#E5E7EB';
+            const color = day.mood ? moodColors[day.mood] : '#DCE4DE';
             
             html += `
                 <div class="trend-day" title="${day.day} - ${day.hasEntry ? 'Mood logged' : 'No entry'}">
@@ -317,7 +341,7 @@ class MoodTracker {
         if (todayEntry) {
             // Pre-fill today's entry
             this.selectMood(todayEntry.mood);
-            const noteElement = document.getElementById('mood-note');
+            const noteElement = document.getElementById('mood-note') || document.getElementById('mood-notes-textarea');
             if (noteElement && todayEntry.note) {
                 noteElement.value = todayEntry.note;
             }
@@ -364,11 +388,11 @@ class MoodTracker {
         
         // Set background color based on type
         const colors = {
-            success: '#10B981',
-            error: '#EF4444',
-            warning: '#F59E0B',
-            info: '#3B82F6',
-            encouragement: '#8B5CF6'
+            success: '#527A68',
+            error: '#944940',
+            warning: '#98763F',
+            info: '#527A74',
+            encouragement: '#667C91'
         };
         notification.style.backgroundColor = colors[type] || colors.info;
         
@@ -439,8 +463,8 @@ style.textContent = `
     
     .mood-option.selected {
         transform: scale(1.05);
-        box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
-        border: 2px solid #6C63FF;
+        box-shadow: 0 8px 25px rgba(82, 122, 116, 0.22);
+        border: 2px solid #527A74;
     }
     
     .mood-trend-chart {
@@ -450,7 +474,7 @@ style.textContent = `
         height: 100px;
         margin: 15px 0;
         padding: 10px;
-        background: #f8fafc;
+        background: #F4F6F2;
         border-radius: 8px;
     }
     
@@ -469,7 +493,7 @@ style.textContent = `
     
     .trend-label {
         font-size: 10px;
-        color: #6B7280;
+        color: #687A73;
         margin-bottom: 5px;
     }
     
@@ -485,7 +509,7 @@ style.textContent = `
         margin-top: 10px;
         font-size: 14px;
         font-weight: 500;
-        color: #374151;
+        color: #344943;
     }
 `;
 

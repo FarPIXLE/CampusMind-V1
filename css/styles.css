@@ -6,27 +6,27 @@
 /* CSS Custom Properties (Variables) */
 :root {
     /* Primary Colors */
-    --primary-blue: #4A90E2;
-    --primary-blue-dark: #357ABD;
-    --primary-blue-light: #6BA3E8;
-    --soft-green: #7ED321;
-    --soft-green-dark: #6BB01E;
+    --primary-blue: #527A74;
+    --primary-blue-dark: #3F625D;
+    --primary-blue-light: #789991;
+    --soft-green: #607E66;
+    --soft-green-dark: #4E6853;
 
     /* Neutral Colors */
-    --calm-blue: #E8F4FD;
-    --light-gray: #F8F9FA;
-    --medium-gray: #E9ECEF;
-    --dark-gray: #6C757D;
-    --text-dark: #2C3E50;
-    --text-light: #6C757D;
-    --white: #FFFFFF;
+    --calm-blue: #E8F0EC;
+    --light-gray: #F4F6F2;
+    --medium-gray: #DCE4DE;
+    --dark-gray: #71807A;
+    --text-dark: #344943;
+    --text-light: #687A73;
+    --white: #FFFEFB;
 
     /* Status Colors */
-    --emergency-red: #E74C3C;
-    --emergency-red-dark: #C0392B;
-    --success-green: #27AE60;
-    --warning-orange: #F39C12;
-    --info-blue: #3498DB;
+    --emergency-red: #B65C53;
+    --emergency-red-dark: #944940;
+    --success-green: #5E8169;
+    --warning-orange: #B68A4F;
+    --info-blue: #628695;
 
     /* Typography */
     --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -65,11 +65,11 @@
     --border-radius-full: 9999px;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 2px 0 rgba(49, 72, 65, 0.04);
+    --shadow-base: 0 1px 3px 0 rgba(49, 72, 65, 0.08), 0 1px 2px 0 rgba(49, 72, 65, 0.04);
+    --shadow-md: 0 4px 8px -2px rgba(49, 72, 65, 0.10), 0 2px 4px -1px rgba(49, 72, 65, 0.05);
+    --shadow-lg: 0 10px 18px -4px rgba(49, 72, 65, 0.12), 0 4px 7px -2px rgba(49, 72, 65, 0.06);
+    --shadow-xl: 0 20px 28px -7px rgba(49, 72, 65, 0.14), 0 10px 12px -5px rgba(49, 72, 65, 0.06);
 
     /* Transitions */
     --transition-fast: 0.15s ease-in-out;
@@ -522,7 +522,7 @@ body {
 .btn-danger:focus:not(:disabled) {
     background: linear-gradient(135deg, var(--emergency-red-dark), var(--emergency-red));
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+    box-shadow: 0 5px 20px rgba(148, 73, 64, 0.3);
 }
 
 /* Stats Dashboard */
@@ -643,6 +643,8 @@ body {
     transition: var(--transition-base);
     background: var(--white);
 }
+
+.mood-selector { align-items: stretch; }
 
 .mood-option:hover,
 .mood-option:focus {
@@ -766,8 +768,16 @@ body {
 
 #mood-chart {
     width: 100%;
-    height: auto;
+    min-height: 110px;
 }
+
+.mood-trend-chart { display: flex; align-items: end; justify-content: space-between; gap: 8px; min-height: 115px; padding: 12px 8px; }
+.trend-day { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: end; min-width: 0; }
+.trend-emoji { font-size: 1.2rem; }
+.trend-label { font-size: .75rem; color: var(--text-light); }
+.trend-bar { width: min(22px, 70%); min-height: 5px; margin-top: 5px; border-radius: 6px 6px 2px 2px; }
+.trend-summary { margin-top: 8px; text-align: center; color: var(--text-light); }
+.chart-placeholder { padding: 18px 8px; text-align: center; color: var(--text-light); }
 
 .chart-insights {
     padding: var(--spacing-md);
@@ -965,6 +975,23 @@ body {
     font-weight: var(--font-weight-medium);
 }
 
+.breathing-session-stats { display: flex; justify-content: center; gap: 20px; color: var(--text-light); font-variant-numeric: tabular-nums; }
+.breathing-controls { display: flex; justify-content: center; gap: 10px; margin: var(--spacing-md) 0; }
+.breathing-history-wrap, .grounding-card, .journal-entries { margin-top: var(--spacing-lg); padding: var(--spacing-md); border-radius: var(--border-radius-md); background: var(--light-gray); text-align: left; }
+.breathing-history-wrap h4, .grounding-card h4, .journal-entries h4 { margin: 0 0 8px; }
+#breathing-history p { margin: 6px 0; font-size: var(--font-size-sm); color: var(--text-light); }
+.grounding-card ol { padding-left: 22px; margin: 8px 0; }
+.grounding-card li { margin: 4px 0; }
+.privacy-note { color: var(--text-light); font-size: var(--font-size-sm); }
+.journal-entry { padding: var(--spacing-md) 0; border-bottom: 1px solid var(--medium-gray); }
+.entry-date { font-size: var(--font-size-sm); color: var(--text-light); }
+.entry-prompt { margin-top: 6px; font-style: italic; color: var(--text-light); }
+.entry-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.journal-delete-btn { border: 0; padding: 6px 0; background: transparent; color: var(--emergency-red-dark); text-decoration: underline; cursor: pointer; }
+.care-plan-options { display: grid; gap: 10px; margin: 18px 0; }
+.care-plan-options label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.care-plan-options input { margin-top: 4px; }
+
 .breathing-techniques {
     display: flex;
     gap: var(--spacing-lg);
@@ -1076,25 +1103,25 @@ body {
     display: flex;
     gap: var(--spacing-md);
     padding: var(--spacing-lg);
-    background: #FFF3CD;
-    border: 1px solid #FFEAA7;
+    background: #F7F0DF;
+    border: 1px solid #EADBB8;
     border-radius: var(--border-radius-md);
     margin-bottom: var(--spacing-xl);
 }
 
 .warning-icon {
     font-size: var(--font-size-xl);
-    color: #856404;
+    color: #80683D;
 }
 
 .warning-content h4 {
-    color: #856404;
+    color: #80683D;
     margin-bottom: var(--spacing-sm);
 }
 
 .warning-content ul {
     margin-left: var(--spacing-lg);
-    color: #856404;
+    color: #80683D;
 }
 
 .warning-content li {
@@ -1641,7 +1668,7 @@ body {
 }
 
 .footer-bottom {
-    border-top: 1px solid #555;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
     padding-top: var(--spacing-xl);
 }
 
@@ -1649,8 +1676,8 @@ body {
     display: flex;
     gap: var(--spacing-md);
     padding: var(--spacing-lg);
-    background: rgba(231, 76, 60, 0.1);
-    border: 1px solid rgba(231, 76, 60, 0.2);
+    background: rgba(182, 92, 83, 0.12);
+    border: 1px solid rgba(182, 92, 83, 0.25);
     border-radius: var(--border-radius-md);
     margin-bottom: var(--spacing-xl);
 }
@@ -1682,7 +1709,7 @@ body {
 
 .compliance-note {
     font-size: var(--font-size-xs);
-    color: #777;
+    color: #C6D0CB;
 }
 
 /* Floating Emergency Button */
@@ -1712,7 +1739,7 @@ body {
 .emergency-btn:hover,
 .emergency-btn:focus {
     transform: scale(1.1);
-    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+    box-shadow: 0 8px 25px rgba(148, 73, 64, 0.32);
 }
 
 .pulse-icon {

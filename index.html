@@ -110,11 +110,11 @@
                     <p class="hero-subtitle animate-fade-in-delay">A safe, confidential space for students to access mental health resources, track wellness, and connect with professional support. You are not alone.</p>
 
                     <div class="cta-buttons animate-fade-in-delay-2">
-                        <button class="btn btn-primary" onclick="MoodTracker.scrollToTracker()" aria-describedby="mood-tracker-desc">
+                        <button class="btn btn-primary" onclick="document.getElementById('mood-tracker').scrollIntoView({behavior:'smooth'})" aria-describedby="mood-tracker-desc">
                             <i class="fas fa-heart" aria-hidden="true"></i>
                             Check Your Mood Today
                         </button>
-                        <button class="btn btn-secondary" onclick="SupportSystem.openChatSupport()" aria-describedby="chat-support-desc">
+                        <button class="btn btn-secondary" onclick="document.getElementById('crisis-contacts').scrollIntoView({behavior:'smooth'})" aria-describedby="chat-support-desc">
                             <i class="fas fa-comments" aria-hidden="true"></i>
                             Talk to Someone Now
                         </button>
@@ -190,30 +190,32 @@
                     <div class="mood-card main-card">
                         <h3>How are you feeling today?</h3>
                         <p class="mood-description">Your feelings are valid. Tracking your mood helps identify patterns and celebrate progress.</p>
-                        <div class="mood-option" data-mood="1" tabindex="0" role="radio" aria-checked="false" aria-label="Very sad - I'm having a very difficult day" onclick="selectMood(1)">
+                        <div class="mood-selector" role="radiogroup" aria-label="Choose your mood">
+                        <div class="mood-option" data-mood="1" tabindex="0" role="radio" aria-checked="false" aria-label="Very sad - I'm having a very difficult day">
                             <div class="mood-emoji">😢</div>
                             <div class="mood-label">Very Sad</div>
                             <div class="mood-desc">Having a very difficult day</div>
                         </div>
-                            <div class="mood-option" data-mood="2" tabindex="0" role="radio" aria-checked="false" aria-label="Sad - Feeling down today" onclick="selectMood(2)">
+                            <div class="mood-option" data-mood="2" tabindex="0" role="radio" aria-checked="false" aria-label="Sad - Feeling down today">
                             <div class="mood-emoji">😞</div>
                             <div class="mood-label">Sad</div>
                             <div class="mood-desc">Feeling down today</div>
                         </div>
-                            <div class="mood-option" data-mood="3" tabindex="0" role="radio" aria-checked="false" aria-label="Neutral - An okay day overall" onclick="selectMood(3)">
+                            <div class="mood-option" data-mood="3" tabindex="0" role="radio" aria-checked="false" aria-label="Neutral - An okay day overall">
                             <div class="mood-emoji">😐</div>
                             <div class="mood-label">Neutral</div>
                             <div class="mood-desc">An okay day overall</div>
                          </div>
-                            <div class="mood-option" data-mood="4" tabindex="0" role="radio" aria-checked="false" aria-label="Happy - Feeling good today" onclick="selectMood(4)">
+                            <div class="mood-option" data-mood="4" tabindex="0" role="radio" aria-checked="false" aria-label="Happy - Feeling good today">
                             <div class="mood-emoji">🙂</div>
                             <div class="mood-label">Happy</div>
                             <div class="mood-desc">Feeling good today</div>
                         </div>
-                            <div class="mood-option" data-mood="5" tabindex="0" role="radio" aria-checked="false" aria-label="Great - Having an excellent day" onclick="selectMood(5)">
+                            <div class="mood-option" data-mood="5" tabindex="0" role="radio" aria-checked="false" aria-label="Great - Having an excellent day">
                             <div class="mood-emoji">😊</div>
                             <div class="mood-label">Great</div>
                             <div class="mood-desc">Having an excellent day</div>
+                        </div>
                         </div>
                         <div class="mood-notes">
                             <label for="mood-notes-textarea">Additional thoughts (optional):</label>
@@ -245,7 +247,7 @@
                     <div class="mood-card chart-card">
                         <h4>📈 Weekly Mood Trends</h4>
                         <div class="mood-chart-container">
-                            <canvas id="mood-chart" width="400" height="200" aria-label="Weekly mood trend chart"></canvas>
+                            <div id="mood-chart" aria-label="Weekly mood trend chart" role="img"></div>
                         </div>
                         <div class="chart-insights" id="chart-insights">
                             <p>Check in daily to see your mood patterns and trends.</p>
@@ -306,6 +308,7 @@
                                         <span class="stat-label">Minutes</span>
                                     </div>
                                 </div>
+                                <p id="meditation-status" class="privacy-note" aria-live="polite">Choose a duration and begin whenever you are ready.</p>
                             </div>
                         </div>
                     </div>
@@ -323,6 +326,10 @@
                                 <div class="breathing-circle" id="breathing-circle">
                                     <div class="breathing-guide" id="breathing-guide">Ready to breathe?</div>
                                 </div>
+                                <div class="breathing-session-stats" aria-live="polite">
+                                    <span id="breathing-timer">0:00</span>
+                                    <span id="breathing-cycles">0 cycles</span>
+                                </div>
 
                                 <div class="breathing-techniques">
                                     <button class="technique-btn" onclick="BreathingTool.start478()" data-technique="478">
@@ -333,11 +340,32 @@
                                         Box Breathing
                                         <small>Focus & Calm</small>
                                     </button>
+                                    <button class="technique-btn" onclick="BreathingTool.startDeepBreathing()" data-technique="deep">
+                                        Easy Breathing
+                                        <small>Gentle pace</small>
+                                    </button>
                                 </div>
-
-                                <button id="breathing-control-btn" class="btn btn-outline" onclick="BreathingTool.stop()" style="display: none;">
-                                    Stop Exercise
-                                </button>
+                                <div id="breathing-controls" class="breathing-controls" style="display: none;">
+                                    <button id="breathing-pause-btn" class="btn btn-secondary" onclick="BreathingTool.togglePause()">Pause</button>
+                                    <button id="breathing-control-btn" class="btn btn-outline" onclick="BreathingTool.stop()">Finish &amp; Save</button>
+                                </div>
+                                <p class="privacy-note">Your session history is saved only in this browser on this device.</p>
+                                <div class="breathing-history-wrap">
+                                    <h4>Recent breathing sessions</h4>
+                                    <div id="breathing-history" aria-live="polite"></div>
+                                </div>
+                                <div class="grounding-card">
+                                    <h4>Need a quick reset? Try 5–4–3–2–1 grounding</h4>
+                                    <p>Notice at your own pace:</p>
+                                    <ol>
+                                        <li><strong>5</strong> things you can see</li>
+                                        <li><strong>4</strong> things you can feel</li>
+                                        <li><strong>3</strong> things you can hear</li>
+                                        <li><strong>2</strong> things you can smell</li>
+                                        <li><strong>1</strong> thing you can taste, or one slow breath</li>
+                                    </ol>
+                                    <p class="privacy-note">Skip any step that feels uncomfortable. You can stop at any time.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -378,53 +406,32 @@
                                         <i class="fas fa-history"></i>
                                         Past Entries
                                     </button>
+                                    <button class="btn btn-outline" onclick="JournalTool.exportEntries()">Export my entries</button>
                                 </div>
+                                <section id="journal-entries" class="journal-entries" hidden aria-label="Past journal entries">
+                                    <h4>Your entries</h4>
+                                    <div id="entries-list"></div>
+                                </section>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Mental Health Assessment -->
+                    <!-- Personal Support Plan -->
                     <div class="tool-card assessment-card">
                         <div class="tool-header">
-                            <div class="tool-icon">📋</div>
-                            <h3>Wellness Assessment</h3>
+                            <div class="tool-icon">🌱</div>
+                            <h3>Small Steps Support Plan</h3>
                         </div>
                         <div class="tool-content">
-                            <div class="assessment-warning">
-                                <div class="warning-icon">⚠️</div>
-                                <div class="warning-content">
-                                    <h4>Important Notice</h4>
-                                    <ul>
-                                        <li>This is not a medical diagnosis</li>
-                                        <li>Results are confidential and stored locally</li>
-                                        <li>Consider professional help for concerning results</li>
-                                        <li>Always consult healthcare providers for serious concerns</li>
-                                    </ul>
-                                </div>
+                            <p>Choose one or two manageable actions for today. This is a personal reminder, not a score or assessment.</p>
+                            <div class="care-plan-options" id="care-plan-options">
+                                <label><input type="checkbox" value="Drink a glass of water"> Drink a glass of water</label>
+                                <label><input type="checkbox" value="Step outside or stretch for a few minutes"> Step outside or stretch for a few minutes</label>
+                                <label><input type="checkbox" value="Message someone I trust"> Message someone I trust</label>
+                                <label><input type="checkbox" value="Take a short break from studying"> Take a short break from studying</label>
+                                <label><input type="checkbox" value="Ask for professional support"> Ask for professional support</label>
                             </div>
-
-                            <div class="assessment-options">
-                                <button class="assessment-btn" onclick="AssessmentTool.startPHQ9()">
-                                    <strong>PHQ-9</strong>
-                                    <small>Depression Screening</small>
-                                </button>
-                                <button class="assessment-btn" onclick="AssessmentTool.startGAD7()">
-                                    <strong>GAD-7</strong>
-                                    <small>Anxiety Screening</small>
-                                </button>
-                                <button class="assessment-btn" onclick="AssessmentTool.startStressScale()">
-                                    <strong>Stress Scale</strong>
-                                    <small>Academic Stress</small>
-                                </button>
-                            </div>
-
-                            <div class="consent-checkbox">
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="assessment-consent">
-                                    <span class="checkmark"></span>
-                                    I understand this is not medical advice and consent to take the assessment
-                                </label>
-                            </div>
+                            <p id="care-plan-status" class="privacy-note" aria-live="polite">Your choices are saved on this device.</p>
                         </div>
                     </div>
                 </div>
@@ -452,7 +459,7 @@
                     <div class="resource-card crisis-card" data-category="crisis">
                         <div class="resource-icon emergency">🚨</div>
                         <h3>24/7 Crisis Support</h3>
-                        <div class="crisis-contacts">
+                        <div class="crisis-contacts" id="crisis-contacts">
                             <a href="tel:1800-599-0019" class="crisis-link">
                                 <i class="fas fa-phone"></i>
                                 KIRAN: 1800-599-0019
@@ -470,7 +477,7 @@
                             </a>
                         </div>
                         <div class="resource-actions">
-                            <button class="btn btn-danger" onclick="CrisisSupport.showEmergencyOptions()">
+                            <button class="btn btn-danger" onclick="document.getElementById('crisis-contacts').scrollIntoView({behavior:'smooth'})">
                                 Emergency Help
                             </button>
                         </div>
@@ -544,33 +551,13 @@
                         <div class="resource-icon peer">👥</div>
                         <h3>Peer Support Network</h3>
                         <div class="peer-options">
-                            <div class="peer-group">
-                                <h4>Support Groups</h4>
-                                <div class="group-schedule">
-                                    <div class="schedule-item">
-                                        <strong>Anxiety Support Circle</strong>
-                                        <span>Wednesdays, 6:00 PM</span>
-                                        <button class="join-btn" onclick="PeerSupport.joinGroup('anxiety')">Join</button>
-                                    </div>
-                                    <div class="schedule-item">
-                                        <strong>Depression Support Group</strong>
-                                        <span>Fridays, 5:00 PM</span>
-                                        <button class="join-btn" onclick="PeerSupport.joinGroup('depression')">Join</button>
-                                    </div>
-                                    <div class="schedule-item">
-                                        <strong>Academic Stress Workshop</strong>
-                                        <span>Saturdays, 2:00 PM</span>
-                                        <button class="join-btn" onclick="PeerSupport.joinGroup('academic')">Join</button>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="peer-chat">
-                                <h4>Anonymous Peer Chat</h4>
-                                <p>Connect with other students in a safe, moderated environment</p>
-                                <button class="btn btn-primary" onclick="window.open('https://hack.chat/?72ktf9p5/', '_blank')">
+                                <h4>Peer Chat</h4>
+                                <p>This opens an external chat room. CampusMind does not operate or moderate it; avoid sharing identifying or sensitive details.</p>
+                                <a class="btn btn-primary" href="https://hack.chat/?72ktf9p5/" target="_blank" rel="noopener noreferrer">
                                     <i class="fas fa-comments"></i>
                                     Join Chat Room
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -597,7 +584,7 @@
                         <div class="about-card">
                             <div class="about-icon">🔒</div>
                             <h3>Privacy & Security</h3>
-                            <p>Your data is protected with end-to-end encryption. All assessments and journals are stored locally and never shared without explicit consent.</p>
+                            <p id="privacy-note">Your journal, check-ins, and tool history are stored in this browser on this device. They are not end-to-end encrypted, so use a device you trust and clear browser data if you want to remove them.</p>
                         </div>
                         <div class="about-card">
                             <div class="about-icon">🏆</div>
@@ -705,20 +692,18 @@
                 <div class="footer-section">
                     <h3>Resources</h3>
                     <ul class="footer-links">
-                        <li><a href="#" onclick="ResourceLibrary.openGuide('crisis-guide')">Crisis Intervention Guide</a></li>
-                        <li><a href="#" onclick="ResourceLibrary.openGuide('faq')">Frequently Asked Questions</a></li>
-                        <li><a href="#" onclick="ResourceLibrary.downloadPDF('complete-guide')">Download Complete Guide</a></li>
-                        <li><a href="#" onclick="FeedbackSystem.openForm()">Feedback & Suggestions</a></li>
+                        <li><a href="#crisis-contacts">Crisis support contacts</a></li>
+                        <li><a href="pdf/Understanding_Anxiety_Disorders.pdf" target="_blank" rel="noopener noreferrer">Understanding anxiety</a></li>
+                        <li><a href="pdf/Managing Academic Stress.pdf" target="_blank" rel="noopener noreferrer">Managing academic stress</a></li>
+                        <li><a href="pdf/complete-guide.rar" download>Download resource archive (RAR)</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
                     <h3>Legal & Privacy</h3>
                     <ul class="footer-links">
-                        <li><a href="#" onclick="LegalModals.openPrivacyPolicy()">Privacy Policy</a></li>
-                        <li><a href="#" onclick="LegalModals.openTermsOfService()">Terms of Service</a></li>
-                        <li><a href="#" onclick="LegalModals.openMedicalDisclaimer()">Medical Disclaimer</a></li>
-                        <li><a href="#" onclick="LegalModals.openAccessibilityStatement()">Accessibility Statement</a></li>
+                        <li><a href="#privacy-note">Privacy &amp; local storage</a></li>
+                        <li><a href="#medical-disclaimer">Medical disclaimer</a></li>
                     </ul>
                 </div>
             </div>
@@ -726,7 +711,7 @@
             <div class="footer-bottom">
                 <div class="footer-disclaimer">
                     <div class="disclaimer-icon">⚠️</div>
-                    <div class="disclaimer-content">
+                    <div class="disclaimer-content" id="medical-disclaimer">
                         <h4>Important Medical Disclaimer</h4>
                         <p>CampusMind provides educational resources and support tools but is not a substitute for professional medical advice, diagnosis, or treatment. Always consult qualified healthcare professionals for mental health concerns. In emergencies, contact local emergency services immediately.</p>
                     </div>
@@ -734,7 +719,6 @@
 
                 <div class="footer-copyright">
                     <p>&copy; 2025 CampusMind - Student Mental Health Platform. Designed with ❤️ for student wellbeing.</p>
-                    <p class="compliance-note">FERPA & HIPAA Compliant | GDPR & International Data Protection Standards</p>
                 </div>
             </div>
         </div>
@@ -742,7 +726,7 @@
 
     <!-- Floating Emergency Button -->
     <div class="floating-emergency" id="emergency-float">
-        <button class="emergency-btn" onclick="CrisisSupport.showEmergencyModal()" aria-label="Emergency crisis support">
+        <button class="emergency-btn" onclick="document.getElementById('crisis-contacts').scrollIntoView({behavior:'smooth'})" aria-label="Emergency crisis support">
             <i class="fas fa-phone pulse-icon"></i>
         </button>
         <div class="emergency-tooltip">
@@ -757,76 +741,12 @@
     <script id="messenger-widget-b" src="https://cdn.botpenguin.com/website-bot.js" defer>68d446c265bb65210f40278a,68c670e1511b1c56323fc293,agent</script>
 
     <!-- JavaScript Modules -->
-    <script src="./js/utils.js"></script>
     <script src="./js/mood-tracker.js"></script>
     <script src="./js/meditation-tool.js"></script>
     <script src="./js/breathing-tool.js"></script>
     <script src="./js/journal-tool.js"></script>
-    <script src="./js/assessment-tool.js"></script>
-    <script src="./js/resource-library.js"></script>
-    <script src="./js/crisis-support.js"></script>
-    <script src="./js/peer-support.js"></script>
-    <script src="./js/professional-support.js"></script>
     <script src="./js/app.js"></script>
-    <script src="js/meditation-tool.js"></script>
     <audio id="meditation-music" src="audio/meditation-music.mp3" loop preload="auto"></audio>
-<audio id="end-sound" src="audio/bell.mp3" preload="auto"></audio>
-<script src="js/mood-tracker.js"></script>
-<!-- Feature scripts: load existing tool files -->
-<script src="js/mood-tracker.js" defer></script>
-<script src="js/breathing-tool.js" defer></script>
-<script src="js/journal-tool.js" defer></script>
-
-<!-- Bootstrap: wire existing UI to tool APIs -->
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    // Mood Tracker init
-    if (window.MoodTracker && typeof MoodTracker.init === 'function') {
-      MoodTracker.init({
-        elements: {
-          notes: '#mood-notes-textarea',
-          saveBtn: '#save-mood-btn',
-          chart: '#mood-chart',
-          insights: '#chart-insights',
-          streakNumber: '#wellness-streak',
-          streakCalendar: '#streak-calendar',
-          streakMessage: '#streak-message'
-        }
-      });
-    }
-
-    // Expose inline handler used by mood options
-    if (!window.selectMood && window.MoodTracker && typeof MoodTracker.selectMood === 'function') {
-      window.selectMood = (n) => MoodTracker.selectMood(n);
-    }
-
-    // Optional: ensure scroll button works if referenced in header
-    if (window.MoodTracker && typeof MoodTracker.scrollToTracker !== 'function') {
-      window.MoodTracker.scrollToTracker = function () {
-        const el = document.getElementById('mood-tracker');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      };
-    }
-
-    // Breathing Exercises init
-    if (window.BreathingTool && typeof BreathingTool.init === 'function') {
-      BreathingTool.init({
-        circle: '#breathing-circle',
-        guide: '#breathing-guide',
-        controlBtn: '#breathing-control-btn'
-      });
-    }
-
-    // Journal init
-    if (window.JournalTool && typeof JournalTool.init === 'function') {
-      JournalTool.init({
-        textarea: '#journal-textarea',
-        wordCount: '#word-count',
-        charCount: '#char-count',
-        prompt: '#daily-prompt'
-      });
-    }
-  });
-</script>
+    <audio id="end-sound" src="audio/bell.mp3" preload="auto"></audio>
 </body>
 </html>
